@@ -1,7 +1,6 @@
 import argparse
 import logging
 import sys
-from sys import argv
 
 import progressbar
 from interpreter import Plingo

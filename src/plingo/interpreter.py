@@ -1,7 +1,6 @@
 import logging
 from copy import deepcopy
 
-import numpy as np
 import progressbar
 from cv2 import cv2
 
