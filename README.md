@@ -21,7 +21,7 @@ Running `plingo example.png` will execute example.png and create the resulting i
 
 ## Command generation
 
-Each pixel of the input is seperated into its RGB values (aka channels). One channel is used for the main command (the exact channel is defined by the `ToDo`). 
+Each pixel of the input is seperated into its RGB values (aka channels). One channel is used for the main command (the exact channel is defined by the `Command Pointer`). 
 The other two channels are used as parameter values for the command to be called.
 
 Values are kept in range by using the modulo operator.
