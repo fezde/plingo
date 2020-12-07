@@ -9,6 +9,9 @@ with open("src/plingo/__init__.py", encoding="utf8") as f:
 setup(
     name="Plingo",
     version=version,
-    install_requires=[],
+    install_requires=[
+        "numpy==1.19.1",
+        "opencv-python==4.4.0.42",
+    ],
     extras_require={},
 )
