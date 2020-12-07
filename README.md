@@ -14,7 +14,7 @@ Each pixel of the inpupt image is a command with up to two parameters. Each comm
 | Input                                       | Output                                                     |
 |---------------------------------------------|------------------------------------------------------------|
 | ![Example Photo](docs/example_graffiti.jpg) | ![Example Photo Output](docs/example_graffiti.jpg_out.png) |
-| ![Github Avatar](docs/ghavatar.png)         | ![Github Avatar Output](docs/ghavatar.png_out.png)         |
+| ![Github Avatar](docs/example_ghavatar.png) | ![Github Avatar Output](docs/example_ghavatar.png_out.png) |
 
 ## Execution
 
