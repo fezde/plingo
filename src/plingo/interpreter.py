@@ -68,22 +68,31 @@ class Plingo():
         except Exception as e:
             logging.error(f"Error executing command `{cmd_number}({p1},{p2})`: {e}")
 
-    def execute(self, show_progressbar=True):
-        if show_progressbar:
-            bar = progressbar.ProgressBar(max_value=(self._height * self._width))
+    def execute(self, show_progressbar=True, iterations=1):
+        for i in range(iterations):
+            if show_progressbar:
+                bar = progressbar.ProgressBar(max_value=(self._height * self._width))
 
-        for self._current_y in range(self._height):
-            for self._current_x in range(self._width):
-                # TODO take more control over output
-                cmd = self._input[self._current_y][self._current_x][self._command_index]
-                p1 = self._input[self._current_y][self._current_x][self._p1_index]
-                p2 = self._input[self._current_y][self._current_x][self._p2_index]
-                self._call_command(cmd, p1, p2)
-                if show_progressbar:
-                    bar.update((self._current_y * self._width) + self._current_x)
+            for self._current_y in range(self._height):
+                for self._current_x in range(self._width):
+                    # TODO take more control over output
+                    cmd = self._input[self._current_y][self._current_x][self._command_index]
+                    p1 = self._input[self._current_y][self._current_x][self._p1_index]
+                    p2 = self._input[self._current_y][self._current_x][self._p2_index]
+                    self._call_command(cmd, p1, p2)
+                    if show_progressbar:
+                        bar.update((self._current_y * self._width) + self._current_x)
 
-        self._output = cv2.cvtColor(self._output, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(f"{self._input_filename}_out.png", self._output)
+            self._output = cv2.cvtColor(self._output, cv2.COLOR_RGB2BGR)
+
+            iteration_text = ""
+            if iterations > 1:
+                iteration_text = str(i)
+                iteration_text = iteration_text.zfill(len(str(iterations)))
+                iteration_text = f"_{iteration_text}"
+            cv2.imwrite(f"{self._input_filename}_out{iteration_text}.png", self._output)
+
+            self._input = deepcopy(self._output)
 
     def _cmd_000_noop(self, p1, p2):
         """Nothing will be done. The parameters will be ignored

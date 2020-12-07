@@ -29,6 +29,12 @@ def main():
         help='very verbose output')
 
     parser.add_argument(
+        '-i', '--iterations',
+        type=int,
+        dest='iterations',
+        help='The number of iterations')
+
+    parser.add_argument(
         '-q',
         dest='logerror',
         action='store_true',
@@ -56,7 +62,10 @@ def main():
     progressbar.streams.wrap_stderr()
     logging.basicConfig(level=log_level)
     lingo = Plingo(args.file)
-    lingo.execute(show_progressbar=show_progressbar)
+    iterations = 1
+    if args.iterations:
+        iterations = args.iterations
+    lingo.execute(show_progressbar=show_progressbar, iterations=iterations)
 
 
 if __name__ == "__main__":
