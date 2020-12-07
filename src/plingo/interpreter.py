@@ -1,6 +1,7 @@
 from cv2 import cv2
 import numpy as np
 from copy import deepcopy
+import logging
 
 
 class Plingo():
@@ -41,8 +42,9 @@ class Plingo():
         self._output = cv2.imread(self._input_filename)
         self._output = cv2.cvtColor(self._output, cv2.COLOR_BGR2RGB)
 
-        print(f"Loaded image: {self._input_filename}")
-        print(f"Dimensions: {self._input.shape}")
+        logging.info("Loading input image")
+        logging.debug(f"Loaded image: {self._input_filename}")
+        logging.debug(f"Dimensions: {self._input.shape}")
         # TODO raise exception if third dimension is != 3
 
         self._height = self._input.shape[0]
@@ -58,12 +60,12 @@ class Plingo():
 
             # TODO better handling of output
             col = self._input[self._current_y][self._current_x]
-            print(f"{self._current_x:04d}/{self._current_y:04d} - ({col}): {cmd}({p1:03d}, {p2:03d})")
+            logging.info(f"{self._current_x:04d}/{self._current_y:04d} - ({col}): {cmd}({p1:03d}, {p2:03d})")
 
             method(p1, p2)
 
         except Exception as e:
-            print(f"Error executing command `{cmd_number}({p1},{p2})`: {e}")
+            logging.error(f"Error executing command `{cmd_number}({p1},{p2})`: {e}")
 
     def execute(self):
         for self._current_y in range(self._height):
@@ -130,7 +132,7 @@ class Plingo():
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
         self._output[new_y][new_x] = deepcopy(self._input[self._current_y][self._current_x])
-        print(f"  copied to {new_x:04d}/{new_y:04d} - {self._output[new_y][new_x]}")
+        logging.debug(f"  copied to {new_x:04d}/{new_y:04d} - {self._output[new_y][new_x]}")
 
     def _cmd_006_copy_plus_minus(self, p1, p2):
         self._cmd_005_copy_plus_plus(p1, -p2)
@@ -179,13 +181,13 @@ class Plingo():
                 if x >= 0 and x < self._width:
                     if y >= 0 and y < self._height:
                         counter += 1
-                        print(f"  adding {x:04d}/{y:04d} - ({self._input[y][x]})")
+                        logging.debug(f"  adding {x:04d}/{y:04d} - ({self._input[y][x]})")
                         for i in range(3):
                             c[i] += self._input[y][x][i]
 
         for i in range(3):
             self._output[self._current_y][self._current_x][i] = round(c[i] / counter)
-        print(f"  result           - ({self._output[self._current_y][self._current_x]})")
+        logging.debug(f"  result           - ({self._output[self._current_y][self._current_x]})")
 
     def _cmd_014_add_plus_plus(self, p1, p2):
         """Add the pixel indicated by the offset parameters to the current pixel.
@@ -198,7 +200,7 @@ class Plingo():
         """
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
-        print(f"  adding {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})")
+        logging.debug(f"  adding {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})")
         for i in range(3):
             v1 = int(self._input[self._current_y][self._current_x][i])
             v2 = int(self._input[new_y][new_x][i])
@@ -224,7 +226,7 @@ class Plingo():
         """
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
-        print(f"  substracting {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})")
+        logging.debug(f"  substracting {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})")
         for i in range(3):
             v1 = int(self._input[self._current_y][self._current_x][i])
             v2 = int(self._input[new_y][new_x][i])
