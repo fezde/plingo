@@ -11,10 +11,12 @@ _An image says more than 1.000 commands_
 Each pixel of the inpupt image is a command with up to two parameters. Each command gets executed and thereby modifies a copy of the image creating a new image. So the source image is the input data and the code ifself.
 
 ### Example
-| Input                                       | Output                                                     |
-|---------------------------------------------|------------------------------------------------------------|
-| ![Example Photo](docs/example_graffiti.jpg) | ![Example Photo Output](docs/example_graffiti.jpg_out.png) |
-| ![Github Avatar](docs/example_ghavatar.png) | ![Github Avatar Output](docs/example_ghavatar.png_out.png) |
+| Input                                       | Output                                                                                              |
+|---------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| ![Example Photo](docs/example_graffiti.jpg) | ![Example Photo Output](docs/example_graffiti.jpg_out.png)                                          |
+| ![Github Avatar](docs/example_ghavatar.png) | ![Github Avatar Output](docs/example_ghavatar.png_out.png)                                          |
+| Iterative examples                          |                                                                                                     |
+| ![Github Avatar](docs/example_ghavatar.png) | ![Github Avatar Output](docs/example_ghavatar_200.gif )<br/>The result of a 200 iteration execution |
 
 ## Execution
 
