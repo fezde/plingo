@@ -93,7 +93,7 @@ class Plingo:
             iteration_text = ""
             if iterations > 1:
                 iteration_text = str(i)
-                iteration_text = iteration_text.zfill(len(str(iterations)))
+                iteration_text = iteration_text.zfill(len(str(iterations - 1)))
                 iteration_text = f"_{iteration_text}"
             cv2.imwrite(f"{self._input_filename}_out{iteration_text}.png", self._output)
 
