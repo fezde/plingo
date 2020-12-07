@@ -5,5 +5,5 @@ doc: build
 build:
 	pip3 install -e .
 
-test: build
-	pytest
+test:
+	tox
