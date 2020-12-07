@@ -1,12 +1,12 @@
-from cv2 import cv2
-import numpy as np
-from copy import deepcopy
 import logging
+from copy import deepcopy
+
+import numpy as np
 import progressbar
+from cv2 import cv2
 
 
-class Plingo():
-
+class Plingo:
     def __init__(self, image_file_name=None):
         """Initialize the new program
 
@@ -37,7 +37,9 @@ class Plingo():
         self._p2_index = (index + 2) % 3
 
     def _load_input(self):
-        self._input = cv2.imread(self._input_filename, )
+        self._input = cv2.imread(
+            self._input_filename,
+        )
         self._input = cv2.cvtColor(self._input, cv2.COLOR_BGR2RGB)
 
         self._output = cv2.imread(self._input_filename)
@@ -61,7 +63,9 @@ class Plingo():
 
             # TODO better handling of output
             col = self._input[self._current_y][self._current_x]
-            logging.info(f"{self._current_x:04d}/{self._current_y:04d} - ({col}): {cmd}({p1:03d}, {p2:03d})")
+            logging.info(
+                f"{self._current_x:04d}/{self._current_y:04d} - ({col}): {cmd}({p1:03d}, {p2:03d})"
+            )
 
             method(p1, p2)
 
@@ -76,7 +80,9 @@ class Plingo():
             for self._current_y in range(self._height):
                 for self._current_x in range(self._width):
                     # TODO take more control over output
-                    cmd = self._input[self._current_y][self._current_x][self._command_index]
+                    cmd = self._input[self._current_y][self._current_x][
+                        self._command_index
+                    ]
                     p1 = self._input[self._current_y][self._current_x][self._p1_index]
                     p2 = self._input[self._current_y][self._current_x][self._p2_index]
                     self._call_command(cmd, p1, p2)
@@ -123,8 +129,9 @@ class Plingo():
 
     def _cmd_003_invert(self, p1, p2):
         for i in range(3):
-            self._output[self._current_y][self._current_x][i] = 255 - \
-                self._input[self._current_y][self._current_x][i]
+            self._output[self._current_y][self._current_x][i] = (
+                255 - self._input[self._current_y][self._current_x][i]
+            )
 
     def _cmd_004_invert_channel(self, p1, p2):
         """Only invert a dedicated channel
@@ -134,8 +141,9 @@ class Plingo():
             p2: Ignored
         """
         i = p1 % 3
-        self._output[self._current_y][self._current_x][i] = 255 - \
-            self._input[self._current_y][self._current_x][i]
+        self._output[self._current_y][self._current_x][i] = (
+            255 - self._input[self._current_y][self._current_x][i]
+        )
 
     def _cmd_005_copy_plus_plus(self, p1, p2):
         """Move the current pixel by the provided offset
@@ -146,8 +154,12 @@ class Plingo():
         """
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
-        self._output[new_y][new_x] = deepcopy(self._input[self._current_y][self._current_x])
-        logging.debug(f"  copied to {new_x:04d}/{new_y:04d} - {self._output[new_y][new_x]}")
+        self._output[new_y][new_x] = deepcopy(
+            self._input[self._current_y][self._current_x]
+        )
+        logging.debug(
+            f"  copied to {new_x:04d}/{new_y:04d} - {self._output[new_y][new_x]}"
+        )
 
     def _cmd_006_copy_plus_minus(self, p1, p2):
         self._cmd_005_copy_plus_plus(p1, -p2)
@@ -196,13 +208,17 @@ class Plingo():
                 if x >= 0 and x < self._width:
                     if y >= 0 and y < self._height:
                         counter += 1
-                        logging.debug(f"  adding {x:04d}/{y:04d} - ({self._input[y][x]})")
+                        logging.debug(
+                            f"  adding {x:04d}/{y:04d} - ({self._input[y][x]})"
+                        )
                         for i in range(3):
                             c[i] += self._input[y][x][i]
 
         for i in range(3):
             self._output[self._current_y][self._current_x][i] = round(c[i] / counter)
-        logging.debug(f"  result           - ({self._output[self._current_y][self._current_x]})")
+        logging.debug(
+            f"  result           - ({self._output[self._current_y][self._current_x]})"
+        )
 
     def _cmd_014_add_plus_plus(self, p1, p2):
         """Add the pixel indicated by the offset parameters to the current pixel.
@@ -215,11 +231,13 @@ class Plingo():
         """
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
-        logging.debug(f"  adding {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})")
+        logging.debug(
+            f"  adding {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})"
+        )
         for i in range(3):
             v1 = int(self._input[self._current_y][self._current_x][i])
             v2 = int(self._input[new_y][new_x][i])
-            self._output[self._current_y][self._current_x][i] = min(255, (v1+v2))
+            self._output[self._current_y][self._current_x][i] = min(255, (v1 + v2))
 
     def _cmd_015_add_plus_minus(self, p1, p2):
         self._cmd_014_add_plus_plus(p1, -p2)
@@ -241,11 +259,13 @@ class Plingo():
         """
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
-        logging.debug(f"  substracting {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})")
+        logging.debug(
+            f"  substracting {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})"
+        )
         for i in range(3):
             v1 = int(self._input[self._current_y][self._current_x][i])
             v2 = int(self._input[new_y][new_x][i])
-            self._output[self._current_y][self._current_x][i] = max(0, (v1-v2))
+            self._output[self._current_y][self._current_x][i] = max(0, (v1 - v2))
 
     def _cmd_019_sub_plus_minus(self, p1, p2):
         self._cmd_018_sub_plus_plus(p1, -p2)

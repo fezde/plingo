@@ -1,44 +1,40 @@
-from interpreter import Plingo
-from sys import argv
-import logging
 import argparse
+import logging
 import sys
+from sys import argv
+
 import progressbar
+from interpreter import Plingo
 
 
 def main():
     log_level = logging.WARN
     show_progressbar = True
 
-    parser = argparse.ArgumentParser(description='Execute a Plingo program')
+    parser = argparse.ArgumentParser(description="Execute a Plingo program")
     parser.add_argument(
-        'file',
-        metavar='FILE',
-        help='the image file containing the Plingo code')
+        "file", metavar="FILE", help="the image file containing the Plingo code"
+    )
 
     parser.add_argument(
-        '-v',
-        dest='loginfo',
-        action='store_true',
-        help='verbose output')
+        "-v", dest="loginfo", action="store_true", help="verbose output"
+    )
 
     parser.add_argument(
-        '-vv',
-        dest='logdebug',
-        action='store_true',
-        help='very verbose output')
+        "-vv", dest="logdebug", action="store_true", help="very verbose output"
+    )
 
     parser.add_argument(
-        '-i', '--iterations',
+        "-i",
+        "--iterations",
         type=int,
-        dest='iterations',
-        help='The number of iterations')
+        dest="iterations",
+        help="The number of iterations",
+    )
 
     parser.add_argument(
-        '-q',
-        dest='logerror',
-        action='store_true',
-        help='no output at all')
+        "-q", dest="logerror", action="store_true", help="no output at all"
+    )
 
     args = parser.parse_args()
 
