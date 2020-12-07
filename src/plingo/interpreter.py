@@ -73,7 +73,9 @@ class Plingo:
 
     def execute(self, show_progressbar=True, iterations=1):
         if show_progressbar:
-            bar = progressbar.ProgressBar(max_value=(self._height * self._width * iterations))
+            bar = progressbar.ProgressBar(
+                max_value=(self._height * self._width * iterations)
+            )
 
         for i in range(iterations):
             for self._current_y in range(self._height):
@@ -86,7 +88,11 @@ class Plingo:
                     p2 = self._input[self._current_y][self._current_x][self._p2_index]
                     self._call_command(cmd, p1, p2)
                     if show_progressbar:
-                        bar.update((i * self._width * self._height) + (self._current_y * self._width) + self._current_x)
+                        bar.update(
+                            (i * self._width * self._height)
+                            + (self._current_y * self._width)
+                            + self._current_x
+                        )
 
             self._output = cv2.cvtColor(self._output, cv2.COLOR_RGB2BGR)
 
