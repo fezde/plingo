@@ -2,6 +2,7 @@ from cv2 import cv2
 import numpy as np
 from copy import deepcopy
 import logging
+import progressbar
 
 
 class Plingo():
@@ -67,7 +68,10 @@ class Plingo():
         except Exception as e:
             logging.error(f"Error executing command `{cmd_number}({p1},{p2})`: {e}")
 
-    def execute(self):
+    def execute(self, show_progressbar=True):
+        if show_progressbar:
+            bar = progressbar.ProgressBar(max_value=(self._height * self._width))
+
         for self._current_y in range(self._height):
             for self._current_x in range(self._width):
                 # TODO take more control over output
@@ -75,6 +79,8 @@ class Plingo():
                 p1 = self._input[self._current_y][self._current_x][self._p1_index]
                 p2 = self._input[self._current_y][self._current_x][self._p2_index]
                 self._call_command(cmd, p1, p2)
+                if show_progressbar:
+                    bar.update((self._current_y * self._width) + self._current_x)
 
         self._output = cv2.cvtColor(self._output, cv2.COLOR_RGB2BGR)
         cv2.imwrite(f"{self._input_filename}_out.png", self._output)

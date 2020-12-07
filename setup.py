@@ -12,6 +12,7 @@ setup(
     install_requires=[
         "numpy==1.19.1",
         "opencv-python==4.4.0.42",
+        "progressbar2==3.53.1",
     ],
     extras_require={},
 )
