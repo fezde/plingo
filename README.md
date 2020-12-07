@@ -10,6 +10,11 @@ _An image says more than 1.000 commands_
 
 Each pixel of the inpupt image is a command with up to two parameters. Each command gets executed and thereby modifies a copy of the image creating a new image. So the source image is the input data and the code ifself.
 
+### Example
+| Input                                         | Output                                                |
+|-----------------------------------------------|-------------------------------------------------------|
+| ![test image size](docs/example_graffiti.jpg) | ![test image size](docs/example_graffiti.jpg_out.png) |
+
 ## Execution
 
 Running `plingo example.png` will execute example.png and create the resulting image example.png._out.png
@@ -23,4 +28,4 @@ Values are kept in range by using the modulo operator.
 
 ## List of commands
 
-For a full list of commands see [api.md]
+For a full list of commands see [docs/api.md](docs/api.md)
