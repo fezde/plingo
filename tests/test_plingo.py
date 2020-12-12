@@ -7,4 +7,4 @@ def test_method_names_match_command_id():
     for idx, cmd in enumerate(lingo._commands):
         parts = cmd.split("_")
         print(parts)
-        assert(idx == int(parts[2]))
+        assert idx == int(parts[2])

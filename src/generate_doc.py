@@ -15,7 +15,7 @@ if __name__ == "__main__":
                 doc = "_not yet documented_"
 
             result = f"{result}## {idx:03d} - {command} \n\n{doc} \n\n"
-        except:
+        except Exception:
             result = f"{result}## {idx:03d} - {command} \n\nNot implemented yet \n\n"
 
     print(result)
