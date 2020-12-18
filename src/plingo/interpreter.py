@@ -133,13 +133,37 @@ class Plingo:
         self._set_command_index(self._command_index - 1)
 
     def _cmd_003_invert(self, p1, p2):
-        for i in range(3):
-            self._output[self._current_y][self._current_x][i] = (
-                255 - self._input[self._current_y][self._current_x][i]
-            )
+        """Inverts the current pixel
 
-    def _cmd_004_invert_channel(self, p1, p2):
-        """Only invert a dedicated channel
+        Args:
+            p1: ignored
+            p2: ignored
+        """
+        self._cmd_004_invert_plus_plus(0, 0)
+
+    def _cmd_004_invert_plus_plus(self, p1, p2):
+        """Invertes the pixel indicated by the offset
+
+        Args:
+            p1 (integer): Offset in positive X direction
+            p2 (integer): Offset in positive Y direction
+        """
+        new_x = (self._current_x + p1) % self._width
+        new_y = (self._current_y + p2) % self._height
+        for i in range(3):
+            self._output[new_y][new_x][i] = 255 - self._input[new_y][new_x][i]
+
+    def _cmd_005_invert_plus_minus(self, p1, p2):
+        self._cmd_004_invert_plus_plus(p1, -p2)
+
+    def _cmd_006_invert_minus_plus(self, p1, p2):
+        self._cmd_004_invert_plus_plus(-p1, p2)
+
+    def _cmd_007_invert_minus_minus(self, p1, p2):
+        self._cmd_004_invert_plus_plus(-p1, -p2)
+
+    def _cmd_008_invert_channel(self, p1, p2):
+        """Only invert a dedicated channel of the current pixel
 
         Args:
             p1 (integer): The channel to be inverted (channel = p1 % 3)
@@ -150,7 +174,7 @@ class Plingo:
             255 - self._input[self._current_y][self._current_x][i]
         )
 
-    def _cmd_005_copy_plus_plus(self, p1, p2):
+    def _cmd_009_copy_plus_plus(self, p1, p2):
         """Move the current pixel by the provided offset
 
         Args:
@@ -166,16 +190,16 @@ class Plingo:
             f"  copied to {new_x:04d}/{new_y:04d} - {self._output[new_y][new_x]}"
         )
 
-    def _cmd_006_copy_plus_minus(self, p1, p2):
-        self._cmd_005_copy_plus_plus(p1, -p2)
+    def _cmd_010_copy_plus_minus(self, p1, p2):
+        self._cmd_009_copy_plus_plus(p1, -p2)
 
-    def _cmd_007_copy_minus_plus(self, p1, p2):
-        self._cmd_005_copy_plus_plus(-p1, p2)
+    def _cmd_011_copy_minus_plus(self, p1, p2):
+        self._cmd_009_copy_plus_plus(-p1, p2)
 
-    def _cmd_008_copy_minus_minus(self, p1, p2):
-        self._cmd_005_copy_plus_plus(-p1, -p2)
+    def _cmd_012_copy_minus_minus(self, p1, p2):
+        self._cmd_009_copy_plus_plus(-p1, -p2)
 
-    def _cmd_009_switch_plus_plus(self, p1, p2):
+    def _cmd_013_switch_plus_plus(self, p1, p2):
         """Switches the current pixel with the one defined by the offset in p1 and p2
 
         Args:
@@ -190,16 +214,16 @@ class Plingo:
         self._input[self._current_y][self._current_x] = other_temp
         self._input[new_y][new_x] = current_temp
 
-    def _cmd_010_switch_plus_minus(self, p1, p2):
-        self._cmd_009_switch_plus_plus(p1, -p2)
+    def _cmd_014_switch_plus_minus(self, p1, p2):
+        self._cmd_013_switch_plus_plus(p1, -p2)
 
-    def _cmd_011_switch_minus_plus(self, p1, p2):
-        self._cmd_009_switch_plus_plus(p1, -p2)
+    def _cmd_015_switch_minus_plus(self, p1, p2):
+        self._cmd_013_switch_plus_plus(p1, -p2)
 
-    def _cmd_012_switch_minus_minus(self, p1, p2):
-        self._cmd_009_switch_plus_plus(-p1, -p2)
+    def _cmd_016_switch_minus_minus(self, p1, p2):
+        self._cmd_013_switch_plus_plus(-p1, -p2)
 
-    def _cmd_013_fade(self, p1, p2):
+    def _cmd_017_fade(self, p1, p2):
         """Mixes the current pixel with the 8 surrounding pixels
 
         Args:
@@ -225,7 +249,7 @@ class Plingo:
             f"  result           - ({self._output[self._current_y][self._current_x]})"
         )
 
-    def _cmd_014_add_plus_plus(self, p1, p2):
+    def _cmd_018_add_plus_plus(self, p1, p2):
         """Add the pixel indicated by the offset parameters to the current pixel.
 
         The value for each channel is clipped at 255
@@ -244,16 +268,16 @@ class Plingo:
             v2 = int(self._input[new_y][new_x][i])
             self._output[self._current_y][self._current_x][i] = min(255, (v1 + v2))
 
-    def _cmd_015_add_plus_minus(self, p1, p2):
-        self._cmd_014_add_plus_plus(p1, -p2)
+    def _cmd_019_add_plus_minus(self, p1, p2):
+        self._cmd_018_add_plus_plus(p1, -p2)
 
-    def _cmd_016_add_minus_plus(self, p1, p2):
-        self._cmd_014_add_plus_plus(-p1, p2)
+    def _cmd_020_add_minus_plus(self, p1, p2):
+        self._cmd_018_add_plus_plus(-p1, p2)
 
-    def _cmd_017_add_minus_minus(self, p1, p2):
-        self._cmd_014_add_plus_plus(-p1, -p2)
+    def _cmd_021_add_minus_minus(self, p1, p2):
+        self._cmd_018_add_plus_plus(-p1, -p2)
 
-    def _cmd_018_sub_plus_plus(self, p1, p2):
+    def _cmd_022_sub_plus_plus(self, p1, p2):
         """Subtract the pixel indicated by the offset parameters from the current pixel.
 
         The value for each channel is clipped at 255
@@ -272,11 +296,11 @@ class Plingo:
             v2 = int(self._input[new_y][new_x][i])
             self._output[self._current_y][self._current_x][i] = max(0, (v1 - v2))
 
-    def _cmd_019_sub_plus_minus(self, p1, p2):
-        self._cmd_018_sub_plus_plus(p1, -p2)
+    def _cmd_023_sub_plus_minus(self, p1, p2):
+        self._cmd_022_sub_plus_plus(p1, -p2)
 
-    def _cmd_020_sub_minus_plus(self, p1, p2):
-        self._cmd_018_sub_plus_plus(-p1, p2)
+    def _cmd_024_sub_minus_plus(self, p1, p2):
+        self._cmd_022_sub_plus_plus(-p1, p2)
 
-    def _cmd_021_sub_minus_minus(self, p1, p2):
-        self._cmd_018_sub_plus_plus(-p1, -p2)
+    def _cmd_025_sub_minus_minus(self, p1, p2):
+        self._cmd_022_sub_plus_plus(-p1, -p2)
