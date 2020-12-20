@@ -4,7 +4,7 @@ if __name__ == "__main__":
     lingo = Plingo()
 
     result = ""
-    for idx, cmd in enumerate(sorted(lingo._commands)):
+    for idx, cmd in enumerate(sorted(lingo._command_names)):
         try:
             method = getattr(lingo, cmd)
 
