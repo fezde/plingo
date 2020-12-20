@@ -18,9 +18,12 @@ Each pixel of the inpupt image is a command with up to two parameters. Each comm
 | Iterative examples                          |                                                                                                     |
 | ![Github Avatar](docs/example_ghavatar.png) | ![Github Avatar Output](docs/example_ghavatar_200.gif )<br/>The result of a 200 iteration execution |
 
-## Execution
-
-Running `plingo example.png` will execute example.png and create the resulting image example.png._out.png
+## Short tutorial
+```shell
+pip install Plingo
+plingo yourimage.png
+```
+Now check the result at `yourimage.png_out.png`
 
 ## Command generation
 
