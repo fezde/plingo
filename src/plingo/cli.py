@@ -5,6 +5,7 @@ import sys
 import progressbar
 
 from . import Plingo
+from . import __version__
 
 
 def main():
@@ -34,6 +35,13 @@ def main():
 
     parser.add_argument(
         "-q", dest="logerror", action="store_true", help="no output at all"
+    )
+
+    parser.add_argument(
+        "-version", "--version",
+        action='version',
+        version=f'plingo version {__version__}'
+
     )
 
     args = parser.parse_args()
