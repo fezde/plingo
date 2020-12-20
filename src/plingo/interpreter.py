@@ -59,6 +59,12 @@ class Plingo:
         cmd_number = cmd_number % len(self._command_names)
 
         try:
+            # TODO better handling of output
+            col = self._input[self._current_y][self._current_x]
+            logging.info(
+                f"{self._current_x:04d}/{self._current_y:04d} - ({col}): {self._command_names[cmd_number]}({p1:03d}, {p2:03d})"
+            )
+
             method = self._command_methods[cmd_number]
             method(p1, p2)
 
@@ -205,8 +211,8 @@ class Plingo:
 
         current_temp = deepcopy(self._input[self._current_y][self._current_x])
         other_temp = deepcopy(self._input[new_y][new_x])
-        self._input[self._current_y][self._current_x] = other_temp
-        self._input[new_y][new_x] = current_temp
+        self._output[self._current_y][self._current_x] = other_temp
+        self._output[new_y][new_x] = current_temp
 
     def _cmd_014_switch_plus_minus(self, p1, p2):
         self._cmd_013_switch_plus_plus(p1, -p2)
