@@ -78,6 +78,8 @@ class Plingo:
             )
 
         for i in range(iterations):
+            logging.info(f"Executing iteration {i:03d})")
+            self._output = deepcopy(self._input)
             for self._current_y in range(self._height):
                 for self._current_x in range(self._width):
                     # TODO take more control over output
@@ -94,6 +96,7 @@ class Plingo:
                             + self._current_x
                         )
 
+            self._input = deepcopy(self._output)
             self._output = cv2.cvtColor(self._output, cv2.COLOR_RGB2BGR)
 
             iteration_text = ""
@@ -102,8 +105,6 @@ class Plingo:
                 iteration_text = iteration_text.zfill(len(str(iterations - 1)))
                 iteration_text = f"_{iteration_text}"
             cv2.imwrite(f"{self._input_filename}_out{iteration_text}.png", self._output)
-
-            self._input = deepcopy(self._output)
 
     def _cmd_000_noop(self, p1, p2):
         """Nothing will be done. The parameters will be ignored
