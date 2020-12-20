@@ -3,7 +3,8 @@ import logging
 import sys
 
 import progressbar
-from interpreter import Plingo
+
+from . import Plingo
 
 
 def main():
