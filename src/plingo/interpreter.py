@@ -18,8 +18,10 @@ class Plingo:
         self._width = -1
         self._height = -1
 
-        self._commands = [x for x in self.__dir__() if x.startswith("_cmd_")]
-        self._commands = sorted(self._commands)
+        self._command_names = [x for x in self.__dir__() if x.startswith("_cmd_")]
+        self._command_names = sorted(self._command_names)
+
+        self._command_methods = [getattr(self, cmd) for cmd in self._command_names]
 
         if image_file_name:
             self._input_filename = image_file_name
@@ -54,18 +56,10 @@ class Plingo:
         # self._output = np.zeros((self._height, self._width, 4), np.uint8)
 
     def _call_command(self, cmd_number, p1, p2):
-        cmd_number = cmd_number % len(self._commands)
+        cmd_number = cmd_number % len(self._command_names)
 
         try:
-            cmd = self._commands[cmd_number]
-            method = getattr(self, cmd)
-
-            # TODO better handling of output
-            col = self._input[self._current_y][self._current_x]
-            logging.info(
-                f"{self._current_x:04d}/{self._current_y:04d} - ({col}): {cmd}({p1:03d}, {p2:03d})"
-            )
-
+            method = self._command_methods[cmd_number]
             method(p1, p2)
 
         except Exception as e:
