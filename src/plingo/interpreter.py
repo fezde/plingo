@@ -100,7 +100,7 @@ class Plingo:
                         )
 
             if save_output:
-                temp = numpy.array(self._next_image_data, dtype=numpy.unint8)
+                temp = numpy.array(self._next_image_data, dtype=numpy.uint8)
                 temp = cv2.cvtColor(temp, cv2.COLOR_RGB2BGR)
 
                 iteration_text = ""
