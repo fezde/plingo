@@ -10,24 +10,24 @@ doc-images:
 	#Generate iterative example
 	plingo -i 200 docs/example_ghavatar.png
 	convert -loop 0 -delay 200 docs/example_ghavatar.png -delay 33 docs/example_ghavatar.png_out_*.png docs/example_ghavatar_200.gif
-	ffmpeg -i docs/example_ghavatar_200.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*24:trunc(ih/2)*24" -sws_flags neighbor docs/example_ghavatar_200.mp4
+	yes | ffmpeg -i docs/example_ghavatar_200.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*24:trunc(ih/2)*24" -sws_flags neighbor docs/example_ghavatar_200.mp4
 	rm docs/example_ghavatar.png_out_*.png
 
 doc-long-animation:
 	#Generate a long iterative example animation
 	plingo -i 2000 docs/example_ghavatar.png
 	convert -loop 0 -delay 200 docs/example_ghavatar.png -delay 5 docs/example_ghavatar.png_out_*.png docs/example_ghavatar_2000.gif
-	ffmpeg -i docs/example_ghavatar_2000.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*24:trunc(ih/2)*24" -sws_flags neighbor docs/example_ghavatar_2000.mp4
+	yes | ffmpeg -i docs/example_ghavatar_2000.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*24:trunc(ih/2)*24" -sws_flags neighbor docs/example_ghavatar_2000.mp4
 	rm docs/example_ghavatar.png_out_*.png
 
-doc-all: doc-long-animation doc-images doc
+doc-all: doc-long-animation doc-images doc-api
 
 build-dist:
 	#pip3 install -e .
 	python3 setup.py bdist_wheel
 
 install: build-dist
-	pip3 install --upgrade dist/Plingo-0.0.1.dev4-py3-none-any.whl
+	pip3 install --upgrade dist/Plingo-0.0.1.dev5-py3-none-any.whl
 
 publish-test: build-dist
 	twine upload --repository testpypi dist/*
