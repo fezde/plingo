@@ -1,5 +1,6 @@
-from plingo import Plingo
 from copy import deepcopy
+
+from plingo import Plingo
 
 
 def test_0_0():

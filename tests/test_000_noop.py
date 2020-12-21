@@ -1,5 +1,6 @@
-from plingo import Plingo
 from copy import deepcopy
+
+from plingo import Plingo
 
 
 def test_zero():
@@ -68,13 +69,13 @@ def test_modulo_call():
         [
             [len(lingo._command_names), 0, 0],
             [len(lingo._command_names), 4, 3],
-            [len(lingo._command_names), 12, 12]
+            [len(lingo._command_names), 12, 12],
         ],
         # Row 2
         [
             [4 * len(lingo._command_names), 1, 1],
             [3 * len(lingo._command_names), 2, 2],
-            [2 * len(lingo._command_names), 12, 13]
+            [2 * len(lingo._command_names), 12, 13],
         ],
     ]
     lingo._next_image_data = deepcopy(input)
