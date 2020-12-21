@@ -1,6 +1,7 @@
 import logging
 from copy import deepcopy
 
+import numpy
 import progressbar
 from cv2 import cv2
 
@@ -14,7 +15,7 @@ class Plingo:
         """
 
         self._set_command_index(0)
-        self._input = None
+        self._image_data = None
         self._width = -1
         self._height = -1
 
@@ -24,8 +25,8 @@ class Plingo:
         self._command_methods = [getattr(self, cmd) for cmd in self._command_names]
 
         if image_file_name:
-            self._input_filename = image_file_name
-            self._load_input()
+            self._image_data_filename = image_file_name
+            self._load_image_data()
 
     def _set_command_index(self, index):
         """Defines which of the three channels contains the command and which two others will contain the parameters.
@@ -37,30 +38,27 @@ class Plingo:
         self._p1_index = (index + 1) % 3
         self._p2_index = (index + 2) % 3
 
-    def _load_input(self):
-        self._input = cv2.imread(
-            self._input_filename,
+    def _load_image_data(self):
+        self._next_image_data = cv2.imread(
+            self._image_data_filename,
         )
-        self._input = cv2.cvtColor(self._input, cv2.COLOR_BGR2RGB)
-
-        self._output = cv2.imread(self._input_filename)
-        self._output = cv2.cvtColor(self._output, cv2.COLOR_BGR2RGB)
-
+        self._next_image_data = cv2.cvtColor(self._next_image_data, cv2.COLOR_BGR2RGB)
         logging.info("Loading input image")
-        logging.debug(f"Loaded image: {self._input_filename}")
-        logging.debug(f"Dimensions: {self._input.shape}")
+        logging.debug(f"Loaded image: {self._image_data_filename}")
+        logging.debug(f"Dimensions: {self._next_image_data.shape}")
         # TODO raise exception if third dimension is != 3
 
-        self._height = self._input.shape[0]
-        self._width = self._input.shape[1]
-        # self._output = np.zeros((self._height, self._width, 4), np.uint8)
+        self._height = self._next_image_data.shape[0]
+        self._width = self._next_image_data.shape[1]
+
+        self._next_image_data = self._next_image_data.tolist()
 
     def _call_command(self, cmd_number, p1, p2):
         cmd_number = cmd_number % len(self._command_names)
 
         try:
             # TODO better handling of output
-            col = self._input[self._current_y][self._current_x]
+            col = self._image_data[self._current_y][self._current_x]
             logging.info(
                 f"{self._current_x:04d}/{self._current_y:04d} - ({col}): {self._command_names[cmd_number]}({p1:03d}, {p2:03d})"
             )
@@ -71,7 +69,7 @@ class Plingo:
         except Exception as e:
             logging.error(f"Error executing command `{cmd_number}({p1},{p2})`: {e}")
 
-    def execute(self, show_progressbar=True, iterations=1):
+    def execute(self, show_progressbar=True, iterations=1, save_output=True):
         if show_progressbar:
             bar = progressbar.ProgressBar(
                 max_value=(self._height * self._width * iterations)
@@ -79,15 +77,20 @@ class Plingo:
 
         for i in range(iterations):
             logging.info(f"Executing iteration {i:03d})")
-            self._output = deepcopy(self._input)
+            self._image_data = deepcopy(self._next_image_data)
+
             for self._current_y in range(self._height):
                 for self._current_x in range(self._width):
                     # TODO take more control over output
-                    cmd = self._input[self._current_y][self._current_x][
+                    cmd = self._image_data[self._current_y][self._current_x][
                         self._command_index
                     ]
-                    p1 = self._input[self._current_y][self._current_x][self._p1_index]
-                    p2 = self._input[self._current_y][self._current_x][self._p2_index]
+                    p1 = self._image_data[self._current_y][self._current_x][
+                        self._p1_index
+                    ]
+                    p2 = self._image_data[self._current_y][self._current_x][
+                        self._p2_index
+                    ]
                     self._call_command(cmd, p1, p2)
                     if show_progressbar:
                         bar.update(
@@ -96,15 +99,19 @@ class Plingo:
                             + self._current_x
                         )
 
-            self._input = deepcopy(self._output)
-            self._output = cv2.cvtColor(self._output, cv2.COLOR_RGB2BGR)
+            if save_output:
+                temp = numpy.array(self._next_image_data, dtype=numpy.unint8)
+                temp = cv2.cvtColor(temp, cv2.COLOR_RGB2BGR)
 
-            iteration_text = ""
-            if iterations > 1:
-                iteration_text = str(i)
-                iteration_text = iteration_text.zfill(len(str(iterations - 1)))
-                iteration_text = f"_{iteration_text}"
-            cv2.imwrite(f"{self._input_filename}_out{iteration_text}.png", self._output)
+                iteration_text = ""
+                if iterations > 1:
+                    iteration_text = str(i)
+                    iteration_text = iteration_text.zfill(len(str(iterations - 1)))
+                    iteration_text = f"_{iteration_text}"
+                cv2.imwrite(
+                    f"{self._image_data_filename}_out{iteration_text}.png",
+                    temp,
+                )
 
     def _cmd_000_noop(self, p1, p2):
         """Nothing will be done. The parameters will be ignored
@@ -152,7 +159,9 @@ class Plingo:
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
         for i in range(3):
-            self._output[new_y][new_x][i] = 255 - self._input[new_y][new_x][i]
+            self._next_image_data[new_y][new_x][i] = (
+                255 - self._image_data[new_y][new_x][i]
+            )
 
     def _cmd_005_invert_plus_minus(self, p1, p2):
         self._cmd_004_invert_plus_plus(p1, -p2)
@@ -171,8 +180,8 @@ class Plingo:
             p2: Ignored
         """
         i = p1 % 3
-        self._output[self._current_y][self._current_x][i] = (
-            255 - self._input[self._current_y][self._current_x][i]
+        self._next_image_data[self._current_y][self._current_x][i] = (
+            255 - self._image_data[self._current_y][self._current_x][i]
         )
 
     def _cmd_009_copy_plus_plus(self, p1, p2):
@@ -184,11 +193,11 @@ class Plingo:
         """
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
-        self._output[new_y][new_x] = deepcopy(
-            self._input[self._current_y][self._current_x]
+        self._next_image_data[new_y][new_x] = deepcopy(
+            self._image_data[self._current_y][self._current_x]
         )
         logging.debug(
-            f"  copied to {new_x:04d}/{new_y:04d} - {self._output[new_y][new_x]}"
+            f"  copied to {new_x:04d}/{new_y:04d} - {self._next_image_data[new_y][new_x]}"
         )
 
     def _cmd_010_copy_plus_minus(self, p1, p2):
@@ -210,10 +219,10 @@ class Plingo:
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
 
-        current_temp = deepcopy(self._input[self._current_y][self._current_x])
-        other_temp = deepcopy(self._input[new_y][new_x])
-        self._output[self._current_y][self._current_x] = other_temp
-        self._output[new_y][new_x] = current_temp
+        current_temp = deepcopy(self._image_data[self._current_y][self._current_x])
+        other_temp = deepcopy(self._image_data[new_y][new_x])
+        self._next_image_data[self._current_y][self._current_x] = other_temp
+        self._next_image_data[new_y][new_x] = current_temp
 
     def _cmd_014_switch_plus_minus(self, p1, p2):
         self._cmd_013_switch_plus_plus(p1, -p2)
@@ -239,15 +248,17 @@ class Plingo:
                     if y >= 0 and y < self._height:
                         counter += 1
                         logging.debug(
-                            f"  adding {x:04d}/{y:04d} - ({self._input[y][x]})"
+                            f"  adding {x:04d}/{y:04d} - ({self._image_data[y][x]})"
                         )
                         for i in range(3):
-                            c[i] += self._input[y][x][i]
+                            c[i] += self._image_data[y][x][i]
 
         for i in range(3):
-            self._output[self._current_y][self._current_x][i] = round(c[i] / counter)
+            self._next_image_data[self._current_y][self._current_x][i] = round(
+                c[i] / counter
+            )
         logging.debug(
-            f"  result           - ({self._output[self._current_y][self._current_x]})"
+            f"  result           - ({self._next_image_data[self._current_y][self._current_x]})"
         )
 
     def _cmd_018_add_plus_plus(self, p1, p2):
@@ -262,12 +273,14 @@ class Plingo:
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
         logging.debug(
-            f"  adding {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})"
+            f"  adding {new_x:04d}/{new_y:04d} - ({self._image_data[new_y][new_x]})"
         )
         for i in range(3):
-            v1 = int(self._input[self._current_y][self._current_x][i])
-            v2 = int(self._input[new_y][new_x][i])
-            self._output[self._current_y][self._current_x][i] = min(255, (v1 + v2))
+            v1 = int(self._image_data[self._current_y][self._current_x][i])
+            v2 = int(self._image_data[new_y][new_x][i])
+            self._next_image_data[self._current_y][self._current_x][i] = min(
+                255, (v1 + v2)
+            )
 
     def _cmd_019_add_plus_minus(self, p1, p2):
         self._cmd_018_add_plus_plus(p1, -p2)
@@ -290,12 +303,14 @@ class Plingo:
         new_x = (self._current_x + p1) % self._width
         new_y = (self._current_y + p2) % self._height
         logging.debug(
-            f"  substracting {new_x:04d}/{new_y:04d} - ({self._input[new_y][new_x]})"
+            f"  substracting {new_x:04d}/{new_y:04d} - ({self._image_data[new_y][new_x]})"
         )
         for i in range(3):
-            v1 = int(self._input[self._current_y][self._current_x][i])
-            v2 = int(self._input[new_y][new_x][i])
-            self._output[self._current_y][self._current_x][i] = max(0, (v1 - v2))
+            v1 = int(self._image_data[self._current_y][self._current_x][i])
+            v2 = int(self._image_data[new_y][new_x][i])
+            self._next_image_data[self._current_y][self._current_x][i] = max(
+                0, (v1 - v2)
+            )
 
     def _cmd_023_sub_plus_minus(self, p1, p2):
         self._cmd_022_sub_plus_plus(p1, -p2)
