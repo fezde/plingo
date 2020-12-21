@@ -254,9 +254,8 @@ class Plingo:
                             c[i] += self._image_data[y][x][i]
 
         for i in range(3):
-            self._next_image_data[self._current_y][self._current_x][i] = round(
-                c[i] / counter
-            )
+            val = min(round(c[i] / counter), 255)
+            self._next_image_data[self._current_y][self._current_x][i] = val
         logging.debug(
             f"  result           - ({self._next_image_data[self._current_y][self._current_x]})"
         )
