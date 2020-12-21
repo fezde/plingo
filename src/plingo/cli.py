@@ -1,4 +1,5 @@
 import argparse
+import cProfile
 import logging
 import sys
 
@@ -38,6 +39,13 @@ def main():
     )
 
     parser.add_argument(
+        "-p",
+        dest="profile",
+        action="store_true",
+        help="do some profiling (for development reasons). This will reduce the overall performance",
+    )
+
+    parser.add_argument(
         "-version",
         "--version",
         action="version",
@@ -45,6 +53,10 @@ def main():
     )
 
     args = parser.parse_args()
+
+    if args.profile:
+        profiler = cProfile.Profile()
+        profiler.enable()
 
     if not args.file:
         parser.print_help()
@@ -70,6 +82,10 @@ def main():
     if args.iterations:
         iterations = args.iterations
     lingo.execute(show_progressbar=show_progressbar, iterations=iterations)
+
+    if args.profile:
+        profiler.disable()
+        profiler.print_stats()
 
 
 if __name__ == "__main__":
