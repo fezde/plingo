@@ -228,7 +228,7 @@ class Plingo:
         self._cmd_013_switch_plus_plus(p1, -p2)
 
     def _cmd_015_switch_minus_plus(self, p1, p2):
-        self._cmd_013_switch_plus_plus(p1, -p2)
+        self._cmd_013_switch_plus_plus(-p1, p2)
 
     def _cmd_016_switch_minus_minus(self, p1, p2):
         self._cmd_013_switch_plus_plus(-p1, -p2)
